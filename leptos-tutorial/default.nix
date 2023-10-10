@@ -6,6 +6,8 @@ let
 in
 pkgs.mkShell {
   buildInputs = with pkgs; [
+    just
+    leptosfmt
     rustup
     trunk
   ];
