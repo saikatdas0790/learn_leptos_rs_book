@@ -1,5 +1,4 @@
-use leptos::{html::Input, *};
-use web_sys::SubmitEvent;
+use leptos::*;
 
 fn main() {
     mount_to_body(|| view! { <App/> })
@@ -7,40 +6,15 @@ fn main() {
 
 #[component]
 fn App() -> impl IntoView {
-    view! {
-        <ControlledComponent/>
-        <UncontrolledComponent/>
-    }
-}
-
-#[component]
-fn ControlledComponent() -> impl IntoView {
-    let (name, set_name) = create_signal("Controlled".to_string());
+    let (value, set_value) = create_signal(0);
+    let is_odd = move || value() & 1 == 1;
+    let odd_text = move || if is_odd() { Some("How odd!") } else { None };
 
     view! {
-        <input type="text" on:input=move |ev| set_name(event_target_value(&ev)) prop:value=name/>
-        <p>"Name is: " {name}</p>
-    }
-}
+        <h1>Control Flow</h1>
+        <button on:click=move |_| set_value.update(|n| *n += 1)>"+1"</button>
+        <p>"Value is: " {value}</p>
 
-#[component]
-fn UncontrolledComponent() -> impl IntoView {
-    let (name, set_name) = create_signal("Uncontrolled".to_string());
-
-    let input_element: NodeRef<Input> = create_node_ref();
-
-    let on_submit = move |ev: SubmitEvent| {
-        ev.prevent_default();
-
-        let value = input_element().expect("<input> element to exist").value();
-        set_name(value);
-    };
-
-    view! {
-        <form on:submit=on_submit>
-            <input type="text" value=name node_ref=input_element/>
-            <input type="submit" value="Submit"/>
-        </form>
-        <p>"Name is: " {name}</p>
+        <hr/>
     }
 }
