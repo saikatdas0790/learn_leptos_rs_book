@@ -8,19 +8,19 @@ fn main() {
 fn App() -> impl IntoView {
     let (count, set_count) = create_signal(0);
 
+    let double_count = move || count() * 2;
+
     view! {
-        <button on:click=move |_| { set_count.update(|n| *n += 2) }>"Click me"</button>
-        <p>
-            <strong>"Reactive: "</strong>
-            {move || count.get()}
-        </p>
-        <p>
-            <strong>"Reactive shorthand: "</strong>
-            {count}
-        </p>
-        <p>
-            <strong>"Not reactive: "</strong>
-            {count()}
-        </p>
+        <button on:click=move |_| set_count.update(|n| *n += 1) class:red=move || count() % 2 == 1>
+            "Click me"
+        </button>
+        <br/>
+
+        <progress max="50" value=count></progress>
+        <br/>
+
+        <progress max="50" value=double_count></progress>
+        <p>"Count: " {count}</p>
+        <p>"Double Count: " {double_count}</p>
     }
 }
