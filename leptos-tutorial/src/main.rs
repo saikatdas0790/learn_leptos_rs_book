@@ -1,4 +1,5 @@
-use leptos::*;
+use leptos::{html::Input, *};
+use web_sys::SubmitEvent;
 
 fn main() {
     mount_to_body(|| view! { <App/> })
@@ -7,76 +8,40 @@ fn main() {
 #[component]
 fn App() -> impl IntoView {
     view! {
-        <h1>"Iteration"</h1>
-        <h2>"Static List"</h2>
-        <p>"Use this pattern if the list itself is static."</p>
-        <StaticList length=5/>
-        <h2>"Dynamic List"</h2>
-        <p>"Use this pattern if the rows in your list will change."</p>
-        <DynamicList initial_length=5/>
+        <h2>"Controlled Component"</h2>
+        <ControlledComponent/>
+        <h2>"Uncontrolled Component"</h2>
+        <UncontrolledComponent/>
     }
 }
 
 #[component]
-fn StaticList(length: usize) -> impl IntoView {
-    let counters = (1..=length).map(create_signal);
+fn ControlledComponent() -> impl IntoView {
+    let (name, set_name) = create_signal("Controlled".to_string());
 
-    let counter_buttons = counters
-        .map(|(count, set_count)| {
-            view! {
-                <li>
-                    <button on:click=move |_| set_count.update(|n| *n += 1)>{count}</button>
-                </li>
-            }
-        })
-        .collect_view();
-
-    view! { <ul>{counter_buttons}</ul> }
+    view! { <input type="text" on:input=move |ev| set_name(event_target_value(&ev)) prop:value=name/> }
 }
 
 #[component]
-fn DynamicList(initial_length: usize) -> impl IntoView {
-    let mut next_counter_id = initial_length;
+fn UncontrolledComponent() -> impl IntoView {
+    let (name, set_name) = create_signal("Uncontrolled".to_string());
 
-    let initial_counters: Vec<_> = (0..initial_length)
-        .map(|id| (id, create_signal(id + 1)))
-        .collect();
+    // we'll use a NodeRef to store a reference to the input element
+    // this will be filled when the element is created
+    let input_element: NodeRef<Input> = create_node_ref();
 
-    let (counters, set_counters) = create_signal(initial_counters);
+    let on_submit = move |ev: SubmitEvent| {
+        ev.prevent_default();
 
-    let add_counter = move |_| {
-        let sig = create_signal(next_counter_id + 1);
-
-        set_counters.update(move |counters| {
-            counters.push((next_counter_id, sig));
-        });
-
-        next_counter_id += 1;
+        let value = input_element().expect("<input> element not found").value();
+        set_name(value);
     };
 
     view! {
-        <div>
-            <button on:click=add_counter>"Add Counter"</button>
-        </div>
-        <ul>
-            <For
-                each=counters
-                key=|counter| counter.0
-                children=move |(id, (count, set_count))| {
-                    view! {
-                        <li>
-                            <button on:click=move |_| set_count.update(|n| *n += 1)>{count}</button>
-                            <button on:click=move |_| {
-                                set_counters
-                                    .update(|counters| {
-                                        counters.retain(|(counter_id, _)| counter_id != &id)
-                                    })
-                            }>"Remove"</button>
-                        </li>
-                    }
-                }
-            />
-
-        </ul>
+        <form on:submit=on_submit>
+            <input type="text" value=name node_ref=input_element/>
+            <input type="submit" value="Submit"/>
+        </form>
+        <p>"Name is: " {name}</p>
     }
 }
