@@ -2,13 +2,13 @@
   // "rust-analyzer.procMacro.ignored": {
   //   "leptos_macro": ["server", "component"]
   // },
-  "rust-analyzer.rustfmt.overrideCommand": ["just", "_vscode-fmt"]
-  // "emmet.includeLanguages": {
-  //   "rust": "html",
-  //   "*.rs": "html"
-  // },
-  // "tailwindCSS.includeLanguages": {
-  //   "rust": "html",
-  //   "*.rs": "html"
-  // }
+  "rust-analyzer.rustfmt.overrideCommand": ["just", "_vscode-fmt"],
+  "emmet.includeLanguages": {
+    "rust": "html",
+    "*.rs": "html"
+  },
+  "tailwindCSS.includeLanguages": {
+    "rust": "html",
+    "*.rs": "html"
+  }
 }

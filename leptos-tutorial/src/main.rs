@@ -1,5 +1,4 @@
-use leptos::{html::Input, *};
-use web_sys::SubmitEvent;
+use leptos::*;
 
 fn main() {
     mount_to_body(|| view! { <App/> })
@@ -7,41 +6,42 @@ fn main() {
 
 #[component]
 fn App() -> impl IntoView {
-    view! {
-        <h2>"Controlled Component"</h2>
-        <ControlledComponent/>
-        <h2>"Uncontrolled Component"</h2>
-        <UncontrolledComponent/>
-    }
-}
-
-#[component]
-fn ControlledComponent() -> impl IntoView {
-    let (name, set_name) = create_signal("Controlled".to_string());
-
-    view! { <input type="text" on:input=move |ev| set_name(event_target_value(&ev)) prop:value=name/> }
-}
-
-#[component]
-fn UncontrolledComponent() -> impl IntoView {
-    let (name, set_name) = create_signal("Uncontrolled".to_string());
-
-    // we'll use a NodeRef to store a reference to the input element
-    // this will be filled when the element is created
-    let input_element: NodeRef<Input> = create_node_ref();
-
-    let on_submit = move |ev: SubmitEvent| {
-        ev.prevent_default();
-
-        let value = input_element().expect("<input> element not found").value();
-        set_name(value);
-    };
+    let (value, set_value) = create_signal(0);
+    let is_odd = move || value() & 1 == 1;
+    let odd_text = move || if is_odd() { Some("How odd!") } else { None };
 
     view! {
-        <form on:submit=on_submit>
-            <input type="text" value=name node_ref=input_element/>
-            <input type="submit" value="Submit"/>
-        </form>
-        <p>"Name is: " {name}</p>
+        <h1>"Control Flow"</h1>
+
+        <button on:click=move |_| set_value.update(|n| *n += 1)>"+1"</button>
+        <p>"Value is: " {value}</p>
+
+        <hr/>
+
+        <h2>
+            <code>"Option<T>"</code>
+        </h2>
+        <p>{odd_text}</p>
+        <p>{move || odd_text().map(|text| text.len())}</p>
+
+        <h2>"Conditional Logic"</h2>
+
+        <p>{move || if is_odd() { "Odd" } else { "Even" }}</p>
+
+        <p class:hidden=is_odd>"Appears if even."</p>
+
+        <Show when=is_odd fallback=|| view! { <p>"Even steven"</p> }>
+            <p>"Oddment"</p>
+        </Show>
+
+        {move || is_odd().then(|| view! { <p>"Oddity!"</p> })}
+
+        <h2>"Converting between Types"</h2>
+
+        {move || match is_odd() {
+            true if value() == 1 => view! { <pre>"One"</pre> }.into_any(),
+            false if value() == 2 => view! { <p>"Two"</p> }.into_any(),
+            _ => view! { <textarea>{value}</textarea> }.into_any(),
+        }}
     }
 }
