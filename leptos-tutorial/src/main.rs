@@ -7,58 +7,56 @@ fn main() {
 
 #[component]
 fn App() -> impl IntoView {
-    let (red, set_red) = create_signal(false);
-    let (right, set_right) = create_signal(false);
-    let (italics, set_italics) = create_signal(false);
-    let (smallcaps, set_smallcaps) = create_signal(false);
+    let (items, set_items) = create_signal(vec![0, 1, 2]);
 
-    provide_context(SmallcapsContext(set_smallcaps));
+    let render_prop = move || {
+        let len = move || items.with(Vec::len);
+        view! { <p>"Length: " {len}</p> }
+    };
 
     view! {
-        <main>
-            <p class:red=red class:right=right class:italics=italics class:smallcaps=smallcaps>
-                "Lorem ipsum sit dolor amet."
-            </p>
-
-            <ButtonA setter=set_red/>
-
-            <ButtonB on_click=move |_| set_right.update(|value| *value = !*value)/>
-
-            <ButtonC on:click=move |_| set_italics.update(|value| *value = !*value)/>
-
-            <ButtonD/>
-        </main>
+        <TakesChildern render_prop>
+            <p>"Here's a child."</p>
+            <p>"Here's another child."</p>
+        </TakesChildern>
+        <hr/>
+        <WrapsChildren>
+            <p>"Here's a child."</p>
+            <p>"Here's another child."</p>
+        </WrapsChildren>
     }
 }
 
-#[derive(Clone, Copy)]
-struct SmallcapsContext(WriteSignal<bool>);
-
 #[component]
-pub fn ButtonA(setter: WriteSignal<bool>) -> impl IntoView {
-    view! { <button on:click=move |_| setter.update(|value| *value = !*value)>"Toggle Red"</button> }
-}
-
-#[component]
-pub fn ButtonB<F>(on_click: F) -> impl IntoView
+pub fn TakesChildern<F, IV>(render_prop: F, children: Children) -> impl IntoView
 where
-    F: Fn(MouseEvent) + 'static,
+    F: Fn() -> IV,
+    IV: IntoView,
 {
-    view! { <button on:click=on_click>"Toggle Right"</button> }
+    view! {
+        <h1>
+            <code>"<TakesChildren />"</code>
+        </h1>
+        <h2>"Render Prop"</h2>
+        {render_prop()}
+        <hr/>
+        <h2>"Children"</h2>
+        {children()}
+    }
 }
 
 #[component]
-pub fn ButtonC() -> impl IntoView {
-    view! { <button>"Toggle Italics"</button> }
-}
-
-#[component]
-pub fn ButtonD() -> impl IntoView {
-    let setter = use_context::<SmallcapsContext>().unwrap().0;
+pub fn WrapsChildren(children: Children) -> impl IntoView {
+    let children = children()
+        .nodes
+        .into_iter()
+        .map(|child| view! { <li>{child}</li> })
+        .collect::<Vec<_>>();
 
     view! {
-        <button on:click=move |_| {
-            setter.update(|value| *value = !*value)
-        }>"Toggle Smallcaps"</button>
+        <h1>
+            <code>"<WrapsChildren/>"</code>
+        </h1>
+        <ul>{children}</ul>
     }
 }
