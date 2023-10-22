@@ -1,5 +1,5 @@
+use gloo_timers::future::TimeoutFuture;
 use leptos::*;
-use web_sys::MouseEvent;
 
 fn main() {
     mount_to_body(|| view! { <App/> })
@@ -7,56 +7,33 @@ fn main() {
 
 #[component]
 fn App() -> impl IntoView {
-    let (items, set_items) = create_signal(vec![0, 1, 2]);
+    let (count, set_count) = create_signal(0);
 
-    let render_prop = move || {
-        let len = move || items.with(Vec::len);
-        view! { <p>"Length: " {len}</p> }
+    let async_data = create_resource(count, |_value| async move {load_data(1).await});
+
+    let stable = create_resource(|| (), |_| async move {load_data(1).await});
+
+    let async_result = move || {
+        async_data.get().map(|value| format!("Server returned {value:?}")).unwrap_or_else(|| "Loading...".into())
     };
 
+    let loading = async_data.loading();
+    let is_loading = move || if loading() { "Loading..." } else { "Idle." };
+
     view! {
-        <TakesChildern render_prop>
-            <p>"Here's a child."</p>
-            <p>"Here's another child."</p>
-        </TakesChildern>
-        <hr/>
-        <WrapsChildren>
-            <p>"Here's a child."</p>
-            <p>"Here's another child."</p>
-        </WrapsChildren>
+        <button on:click=move |_| {
+            set_count.update(|n| *n += 1);
+        }>"Click me"</button>
+
+        <p><code>"stable"</code>": " {stable}</p>
+        
+        <p><code>"count"</code>": " {count}</p>
+
+        <p><code>"async_value"</code>": "{async_result}<br/>{is_loading}</p>
     }
 }
 
-#[component]
-pub fn TakesChildern<F, IV>(render_prop: F, children: Children) -> impl IntoView
-where
-    F: Fn() -> IV,
-    IV: IntoView,
-{
-    view! {
-        <h1>
-            <code>"<TakesChildren />"</code>
-        </h1>
-        <h2>"Render Prop"</h2>
-        {render_prop()}
-        <hr/>
-        <h2>"Children"</h2>
-        {children()}
-    }
-}
-
-#[component]
-pub fn WrapsChildren(children: Children) -> impl IntoView {
-    let children = children()
-        .nodes
-        .into_iter()
-        .map(|child| view! { <li>{child}</li> })
-        .collect::<Vec<_>>();
-
-    view! {
-        <h1>
-            <code>"<WrapsChildren/>"</code>
-        </h1>
-        <ul>{children}</ul>
-    }
+async fn load_data(value: i32) -> i32 {
+    TimeoutFuture::new(1_000).await;
+    value * 10
 }
