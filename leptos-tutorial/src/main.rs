@@ -7,33 +7,21 @@ fn main() {
 
 #[component]
 fn App() -> impl IntoView {
-    let (count, set_count) = create_signal(0);
+    let (name, set_name) = create_signal("Bill".to_string());
 
-    let async_data = create_resource(count, |_value| async move {load_data(1).await});
-
-    let stable = create_resource(|| (), |_| async move {load_data(1).await});
-
-    let async_result = move || {
-        async_data.get().map(|value| format!("Server returned {value:?}")).unwrap_or_else(|| "Loading...".into())
-    };
-
-    let loading = async_data.loading();
-    let is_loading = move || if loading() { "Loading..." } else { "Idle." };
+    let async_data = create_resource(name, |name| async move { important_api_call(name).await });
 
     view! {
-        <button on:click=move |_| {
-            set_count.update(|n| *n += 1);
-        }>"Click me"</button>
-
-        <p><code>"stable"</code>": " {stable}</p>
-        
-        <p><code>"count"</code>": " {count}</p>
-
-        <p><code>"async_value"</code>": "{async_result}<br/>{is_loading}</p>
+        <input on:input=move |ev| {set_name(event_target_value(&ev))} prop:value=name/>
+        <p><code>"name: "</code>{name}</p>
+        <Suspense fallback=move || {view! { <p>"Loading..."</p> }}>
+            <p>"Your shouting name is "</p>
+            {move || async_data.get() }
+        </Suspense>
     }
 }
 
-async fn load_data(value: i32) -> i32 {
+async fn important_api_call(name: String) -> String {
     TimeoutFuture::new(1_000).await;
-    value * 10
+    name.to_ascii_uppercase()
 }
