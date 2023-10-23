@@ -2,7 +2,11 @@
   // "rust-analyzer.procMacro.ignored": {
   //   "leptos_macro": ["server", "component"]
   // },
-  "rust-analyzer.rustfmt.overrideCommand": ["just", "_vscode-fmt"],
+  "rust-analyzer.rustfmt.overrideCommand": [
+    "leptosfmt",
+    "--stdin",
+    "--rustfmt"
+  ],
   "emmet.includeLanguages": {
     "rust": "html",
     "*.rs": "html"

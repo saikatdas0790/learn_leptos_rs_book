@@ -7,21 +7,39 @@ fn main() {
 
 #[component]
 fn App() -> impl IntoView {
-    let (name, set_name) = create_signal("Bill".to_string());
+    let (tab, set_tab) = create_signal(0);
 
-    let async_data = create_resource(name, |name| async move { important_api_call(name).await });
+    let user_data = create_resource(tab, |tab| async move {important_api_call(tab).await});
 
     view! {
-        <input on:input=move |ev| {set_name(event_target_value(&ev))} prop:value=name/>
-        <p><code>"name: "</code>{name}</p>
-        <Suspense fallback=move || {view! { <p>"Loading..."</p> }}>
-            <p>"Your shouting name is "</p>
-            {move || async_data.get() }
-        </Suspense>
+        <div class="buttons">
+            <button on:click=move |_| set_tab(0) class:selected=move || tab() == 0>
+                "Tab A"
+            </button>
+            <button on:click=move |_| set_tab(1) class:selected=move || tab() == 1>
+                "Tab B"
+            </button>
+            <button on:click=move |_| set_tab(2) class:selected=move || tab() == 2>
+                "Tab C"
+            </button>
+            {move || if user_data.loading().get() { "Loading..." } else { "" }}
+
+            <Transition fallback=move || view! { <p>"Loading..."</p> }>
+                <p>{move || user_data.get()}</p>
+            </Transition>
+        </div>
     }
 }
 
-async fn important_api_call(name: String) -> String {
+async fn important_api_call(id: usize) -> String {
     TimeoutFuture::new(1_000).await;
-    name.to_ascii_uppercase()
+    match id {
+        0 => "Alice",
+        1 => "Bob",
+        2 => "Carol",
+        _ => "User not found",
+    }
+    .to_string()
 }
+
+
