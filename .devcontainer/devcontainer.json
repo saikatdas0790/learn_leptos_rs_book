@@ -20,6 +20,7 @@
         "tamasfe.even-better-toml",
         "rust-lang.rust-analyzer",
         "vadimcn.vscode-lldb",
+        "fill-labs.dependi",
         // shell
         "TheNuProjectContributors.vscode-nushell-lang"
       ]
