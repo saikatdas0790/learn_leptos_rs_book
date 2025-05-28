@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "cargo make",
+            "type": "cargo",
+            "group": "build",
+            "command": "make",
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": false,
+                "group": "${cwd}"
+            }
+        }
+    ]
+}

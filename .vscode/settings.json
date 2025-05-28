@@ -1,0 +1,8 @@
+{
+    "terminal.integrated.profiles.linux": {
+        "nushell": {
+            "path": "/usr/local/bin/nu"
+        }
+    },
+    "terminal.integrated.defaultProfile.linux": "nushell",
+}
