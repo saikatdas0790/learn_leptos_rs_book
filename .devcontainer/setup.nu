@@ -13,3 +13,6 @@ rm cargo-binstall.tgz;
 
 # Install trunk using cargo binstall
 cargo binstall trunk --no-confirm;
+
+# Install leptosfmt using cargo binstall
+cargo binstall leptosfmt --no-confirm;

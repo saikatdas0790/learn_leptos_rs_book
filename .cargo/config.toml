@@ -1,0 +1,14 @@
+[target.aarch64-apple-darwin]
+rustflags = ["--cfg", "erase_components"]
+
+[target.x86_64-apple-darwin]
+rustflags = ["--cfg", "erase_components"]
+
+[target.x86_64-pc-windows-msvc]
+rustflags = ["--cfg", "erase_components"]
+
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["--cfg", "erase_components"]
+
+[target.wasm32-unknown-unknown]
+rustflags = ["--cfg", "erase_components"]

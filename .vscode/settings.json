@@ -5,4 +5,17 @@
         }
     },
     "terminal.integrated.defaultProfile.linux": "nushell",
+    "rust-analyzer.procMacro.ignored": {
+        "leptos_macro": [
+            // optional:
+            // "component",
+            // "server"
+        ],
+    },
+    // "rust-analyzer.cargo.features": ["ssr"]
+    "rust-analyzer.rustfmt.overrideCommand": [
+        "leptosfmt",
+        "--stdin",
+        "--rustfmt"
+    ]
 }
