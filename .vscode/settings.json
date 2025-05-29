@@ -17,5 +17,8 @@
         "leptosfmt",
         "--stdin",
         "--rustfmt"
-    ]
+    ],
+    "emmet.includeLanguages": {
+        "rust": "html",
+    }
 }
