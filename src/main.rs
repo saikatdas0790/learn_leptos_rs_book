@@ -9,27 +9,17 @@ fn main() {
 #[component]
 fn App() -> impl IntoView {
     let (count, set_count) = signal(0);
-    let double_count = move || count.get() * 2;
+    let double_count = move || *count.read() * 2;
 
     view! {
-        <button
-            on:click=move |_| {
-                *set_count.write() += 1;
-            }
-            class:red=move || count.get() % 2 == 1
-            class=("button-20", move || count.get() % 2 == 1)
-        >
-            "Click me: "
-        </button>
-
-        <br />
-
-        <progress max="50" value=count></progress>
-
-        <br />
-
-        <progress max="50" value=double_count></progress>
-        <p>"Count: " {count}</p>
-        <p>"Double count: " {double_count}</p>
+        <button on:click=move |_| {
+            *set_count.write() += 1;
+        }>"Click me: "</button>
+        <ProgressBar progress=count max=50 />
     }
+}
+
+#[component]
+fn ProgressBar(#[prop(default = 100)] max: u16, progress: ReadSignal<i32>) -> impl IntoView {
+    view! { <progress style:display="block" style:margin-top="1rem" max=max value=progress></progress> }
 }
