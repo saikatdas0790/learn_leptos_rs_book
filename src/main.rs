@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use leptos::prelude::*;
 
 fn main() {
@@ -16,10 +18,14 @@ fn App() -> impl IntoView {
             *set_count.write() += 1;
         }>"Click me: "</button>
         <ProgressBar progress=count />
+        <ProgressBar progress=double_count />
     }
 }
 
 #[component]
-fn ProgressBar(#[prop(default = 100)] max: u16, progress: impl Fn() -> i32) -> impl IntoView {
-    view! { <progress max=max value=progress></progress> }
+fn ProgressBar(
+    #[prop(default = 100)] max: u16,
+    progress: impl Fn() -> i32 + Send + 'static,
+) -> impl IntoView {
+    view! { <progress max=max value=progress style:display="block" style:margin-top="1rem"></progress> }
 }

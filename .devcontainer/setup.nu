@@ -1,7 +1,8 @@
+sleep 2sec;
+
 # Force Rust installation
 rustup update;
 
-sleep 2sec;
 
 # Install cargo binstall
 http get https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz | save cargo-binstall.tgz;

@@ -2,10 +2,10 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "cargo make",
-            "type": "cargo",
+            "label": "trunk serve",
+            "type": "shell",
             "group": "build",
-            "command": "make",
+            "command": "trunk serve",
             "problemMatcher": [
                 "$rustc"
             ],
