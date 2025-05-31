@@ -15,11 +15,11 @@ fn App() -> impl IntoView {
         <button on:click=move |_| {
             *set_count.write() += 1;
         }>"Click me: "</button>
-        <ProgressBar progress=count max=50 />
+        <ProgressBar progress=count />
     }
 }
 
 #[component]
-fn ProgressBar(#[prop(default = 100)] max: u16, progress: ReadSignal<i32>) -> impl IntoView {
-    view! { <progress style:display="block" style:margin-top="1rem" max=max value=progress></progress> }
+fn ProgressBar(#[prop(default = 100)] max: u16, progress: impl Fn() -> i32) -> impl IntoView {
+    view! { <progress max=max value=progress></progress> }
 }
