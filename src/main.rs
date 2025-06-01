@@ -14,29 +14,18 @@ fn App() -> impl IntoView {
     let double_count = move || *count.read() * 2;
 
     view! {
-        // <button on:click=move |_| {
-        // *set_count.write() += 1;
-        // }>"Click me: "</button>
-        // <ProgressBar progress=count />
-        // <ProgressBar progress=double_count />
-        <span style:display="block">
-            <SizeOf<usize> />
-        </span>
-        <span style:display="block">
-            <SizeOf<String> />
-        </span>
+        <button on:click=move |_| {
+            *set_count.write() += 1;
+        }>"Click me: "</button>
+        <ProgressBar progress=count />
+        <ProgressBar progress=Signal::derive(double_count) />
     }
 }
 
 #[component]
 fn ProgressBar(
     #[prop(default = 100)] max: u16,
-    progress: impl Fn() -> i32 + Send + 'static,
+    #[prop(into)] progress: Signal<i32>,
 ) -> impl IntoView {
     view! { <progress max=max value=progress style:display="block" style:margin-top="1rem"></progress> }
-}
-
-#[component]
-fn SizeOf<T: Sized>(#[prop(optional)] _ty: PhantomData<T>) -> impl IntoView {
-    std::mem::size_of::<T>()
 }
