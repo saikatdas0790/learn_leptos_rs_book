@@ -17,15 +17,15 @@ fn App() -> impl IntoView {
         <button on:click=move |_| {
             *set_count.write() += 1;
         }>"Click me: "</button>
-        <ProgressBar progress=count />
-        <ProgressBar progress=Signal::derive(double_count) />
+        <ProgressBar />
     }
 }
 
 #[component]
 fn ProgressBar(
-    #[prop(default = 100)] max: u16,
-    #[prop(into)] progress: Signal<i32>,
+    #[prop(optional)] progress: Option<Box<dyn Fn() -> i32 + Send + Sync>>,
 ) -> impl IntoView {
-    view! { <progress max=max value=progress style:display="block" style:margin-top="1rem"></progress> }
+    progress.map(|progress| {
+        view! { <progress max=100 value=progress></progress> }
+    })
 }
