@@ -12,6 +12,11 @@ fn App() -> impl IntoView {
 
     view! {
         <button on:click=move |_| *counter.write() += 1>{counter}</button>
-        <p>{move || *counter.read() * 2}</p>
+        <ProgressBar progress=counter />
     }
+}
+
+#[component]
+fn ProgressBar(progress: RwSignal<u32>) -> impl IntoView {
+    view! { <progress max="50" value=move || *progress.read()></progress> }
 }
